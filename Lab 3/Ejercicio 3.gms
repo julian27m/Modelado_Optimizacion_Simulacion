@@ -8,7 +8,6 @@ Sets
 i cancion  /1, 2, 3, 4, 5, 6, 7, 8/
 j tipo /BluesRock, RockAndRoll/
 k duracion /2,3,4,5/
-alias(p,i)
 
 Parameter d(i) cancionDuracion
          / 1 4, 2 5, 3 3, 4 2, 5 4, 6 3, 7 5, 8 4/  ;
