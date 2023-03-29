@@ -6,9 +6,11 @@
 
 Sets
 i pueblo  /1, 2, 3, 4, 5, 6/
+
 alias(j,i)
 
-
+Parameter
+d tiempo max entre pueblos /15/
 
 Table t(i,j) tiempo_pueblos
        1     2     3     4     5     6
@@ -37,7 +39,7 @@ TodoCubierto
 ;
 
 objectiveFunction         .. z =e= sum(i,x(i));
-TodoCubierto(i)          .. sum(j$(t(i,j)<=15),x(j)) =g= 1;
+TodoCubierto(i)          .. sum(j$(t(i,j)<=d),x(j)) =g= 1;
 
 
 
