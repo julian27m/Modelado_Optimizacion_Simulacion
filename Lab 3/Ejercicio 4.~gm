@@ -49,7 +49,7 @@ TodasCubiertasSinRepetirTuberia
 
 objectiveFunction                     .. z =e= sum((i),x(i));
 
-TodasCubiertasSinRepetirTuberia(j)    ..sum(i,x(i)*c(i,j))=g=1 ;
+TodasCubiertasSinRepetirTuberia(j)    ..sum(i,x(i)*c(i,j))=e=1 ;
 
 
 Model Ejercicio4 /all/;
