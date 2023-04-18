@@ -13,7 +13,6 @@ import sys
 import os
 
 #os.system("clear")
-
 #sys.exit("Stopped")
 
 
@@ -35,25 +34,17 @@ t = {
     (6,1): 20, (6,2): 10, (6,3): 20, (6,4): 25, (6,5): 14, (6,6): 0,
 }
 
-
-
-
-
 #VARIABLES*********************************************************************
 model.x = Var(i, domain=Binary)
 
-
 #OBJECTIVE FUNCTION************************************************************
 model.z = Objective(expr=sum(model.x[i] for i in i), sense=minimize)
-
 
 # CONSTRAINTS******************************************************************
 def todo_cubierto_rule(model, i):
     return sum(model.x[j] for j in j if t[i, j] <= d) >= 1
 
 model.todo_cubierto = Constraint(i, rule=todo_cubierto_rule)
-
-
 
 #APPLYING THE SOLVER************************************************************
 SolverFactory('glpk').solve(model)
