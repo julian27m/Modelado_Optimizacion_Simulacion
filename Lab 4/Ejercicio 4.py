@@ -13,7 +13,11 @@ from pyomo.opt import SolverFactory
 import sys
 import os
 
+import matplotlib
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+
 
 os.system("cls")
 
@@ -116,9 +120,22 @@ def intermediateNode(Model,i):
 Model.intermediate=Constraint(N, rule=intermediateNode)
 
 SolverFactory('glpk').solve(Model)
-
-plt.style.use('ggplot')
-plt.plot([20,22,9,3,21,29,14], [6,1,2,25,10,2,12], 'ro')
-plt.axis([0,30,0,25])
-plt.show()
 Model.display()
+
+# PLOT**************************************************************************
+plt.figure()
+plt.style.use('ggplot')
+
+for i in N:
+    plt.scatter(Model.a[i],Model.b[i], c='black')
+    plt.text(Model.a[i]+0.5, Model.b[i],i)
+
+for i, j in Model.h:
+    if Model.h[i,j] < 999:
+        plt.plot([Model.a[i],Model.c[j]],[Model.b[i],Model.d[j]], ':', c='black')
+
+for i, j in Model.x:
+    if Model.x[i,j].value > 0:
+        plt.plot([Model.a[i],Model.c[j]],[Model.b[i],Model.d[j]], c='red')
+
+plt.show()
