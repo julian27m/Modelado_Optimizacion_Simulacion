@@ -13,6 +13,8 @@ from pyomo.opt import SolverFactory
 import sys
 import os
 
+import matplotlib.pyplot as plt
+
 os.system("cls")
 
 #sys.exit("Stopped")
@@ -114,4 +116,9 @@ def intermediateNode(Model,i):
 Model.intermediate=Constraint(N, rule=intermediateNode)
 
 SolverFactory('glpk').solve(Model)
+
+plt.style.use('ggplot')
+plt.plot([20,22,9,3,21,29,14], [6,1,2,25,10,2,12], 'ro')
+plt.axis([0,30,0,25])
+plt.show()
 Model.display()
