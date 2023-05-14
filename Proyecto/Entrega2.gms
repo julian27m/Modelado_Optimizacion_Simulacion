@@ -7,23 +7,18 @@
 Sets
 i nodos  /SD1, ML2, ML5, W1, W4, W5, W6, S12, R1, R2, S1, S2, TX1, TX3, TX5, V2, V1, C2, C1, LL0, LL3, RGD0, RGD1, AU1, G1, G3, B1, B3, B4, O1,O3, Q1, Q3/
 o origen /ML5/
-d destino /W6/
+n destino /W6/
 v horas /6:30, 8:00, 9:30, 11:00, 12:30, 14:00, 15:30, 17:00, 18:30/
-m pisos maximos /ML2 10, W1 9/
 s salida /18:00/
 alias(j,i);
 
 
-Parameter g(i) distancia en X de cada nodo i
-         / 1 20, 2 22, 3 9, 4 3, 5 21, 6 29,  14/  ;
-Parameter h(i) distancia en Y de cada nodo i 7
-         / 1 6, 2 1, 3 2, 4 25, 5 10, 6 2, 7 12/  ;
-Parameter k(j) distancia en X de cada nodo j
-         / 1 20, 2 22, 3 9, 4 3, 5 21, 6 29, 7 14/  ;
-Parameter m(j) distancia en Y de cada nodo j
-         / 1 6, 2 1, 3 2, 4 25, 5 10, 6 2, 7 12/  ;
+Parameter p(i) distancia en X de cada nodo i
+/SD1 10, ML2 10, ML5 10, W1 9, W4 9, W5 9, W6 9, S12 4, R1 2, R2 2, S1 2, S2 2, TX1 7, TX3 7, TX5 7, V2 2, V1 2, C2 7, C1 7, LL0 3, LL3 3, RGD0 7, RGD1 7, AU1 4, G1 6, G3 6, B1 4, B3 4, B4 4, O1 6,O3 6, Q1 8, Q3 8/;
 
-Parameter distancia(i,j);
+Parameter t(i,j) Tiempo que se demora una persona para caminar del nodo i al nodo j a una velocidad constante de 5km por h  ;
+Parameter D(i,j);
+Parameter a;
 
 D('SD1','ML2')=220;
 D('SD1','W1')=270;
@@ -72,39 +67,35 @@ D('G1','G3')=10;
 D('C2','W6')=100;
 D('C1','W4')=100;
 
-
-
-
-
-
-Table a(i,j)
-       1   2   3   4   5   6   7
-1      0   1   1   0   1   1   1
-2      1   0   1   0   1   1   1
-3      1   1   0   0   1   1   1
-4      0   0   0   0   0   0   1
-5      1   1   1   0   0   1   1
-6      1   1   1   0   1   0   1
-7      1   1   1   1   1   1   0
-;
-
 loop(i,
     loop(j,
-       if ((a(i,j) eq 1),
-          distancia(i,j)=sqrt(sqr((g(i)-k(j)))+sqr((h(i)-m(j))));
-       else
-          distancia(i,j)=999;
-       );
-     );
+        if (substr(i,1,2) <> substr(j,1,2),
+            t(i,j) = (D(i,j)/5);
+        else
+            t(i,j) = 999;
+        );
+    );
 );
 
 
+loop(i,
+    loop(j,
+        if ((D(i,j) ge 5),
+            a = 13;
+        else
+            a=40;
+        );
+    );
+);
+
 Variables
-  x(i,j)   Indica si se activa el nodo o no
+
+  x(i,j)  Determina si el camino entre el nodo i y el nodo j fue seleccionado
   z   Funcion obj
   ;
 
 Binary variable  x(i,j);
+
 
 Equations
 
@@ -114,17 +105,17 @@ destinationNode
 intermediateNode
 ;
 
-objectiveFunction                                 .. z =e= sum((i,j),x(i,j)*distancia(i,j));
-sourceNode(i)$(ord(i)=4)                          .. sum((j),x(i,j)) =e= 1;
-destinationNode(j)$(ord(j)=6)                     .. sum((i),x(i,j)) =e= 1;
-intermediateNode(i)$(ord(i)<>4 and ord(i) ne 6)   .. sum((j), x(i,j)) - sum((j),x(j,i)) =e= 0;
+objectiveFunction                                     .. z =e= sum((i,j),x(i,j)*(t(i,j)+a));
+sourceNode(i)$(ord(i)= 2)                             .. sum(j,x(i,j)) =e= 1;
+destinationNode(j)$(ord(j)= 7)                        .. sum(i,x(i,j)) =e= 1;
+intermediateNode(i)$(ord(i)<>2 and ord(i) ne 7)       .. sum(j,x(i,j)) - sum(j,x(j,i)) =e= 0;
 
 
 
 
-Model Ejercicio4 /all/;
+Model Ejercicio1/all/;
 option mip=CPLEX;
-Solve Ejercicio4 using mip minimizing z;
+Solve Ejercicio1 using mip minimizing z;
 
 Display z.l;
 Display x.l;
