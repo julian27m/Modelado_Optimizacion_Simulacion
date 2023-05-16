@@ -22,10 +22,13 @@ Model.si_no = Var(Model.i,Model.j,within=Binary)
 
 # Parameters
 p = {'SD1':10, 'ML2':10, 'ML5':10, 'W1':9, 'W4':9, 'W5':9, 'W6':9, 'S12': 4, 'R1': 2,  'V1':21, 'AU1':4}
-hora = '8:00'
-origen='W1'
+hora = '6:25'
+origen='SD1'
 destino='TX5'
+lenIni = len(origen)
+lendest = len(destino)
 
+formas= []
 D={}
 t={}
 for i in Model.i:
@@ -49,15 +52,20 @@ for (i, j), distance in {
     D[(i, j)] = distance
     D[(j, i)] = distance
 
+forma = {}
+tiempo_asc = 0
+tiempo_esc = 0
 #print(D)
 pisos_desplazados = 0
 for i in Model.i:
     for j in Model.j:
+        
         if  D[(i,j)]==999:
                 t[(i,j)]=999
         else:
             if i[:-1] != j[:-1] and i!=j :
-                t[(i,j)] = D[(i,j)] / 5
+                t[(i,j)] = D[(i,j)] / 0.833333333 #0.833333333 m/s = 3 km/h 
+ 
                 
             elif i == j:
                 t[(i,j)] = 999
@@ -69,9 +77,8 @@ for i in Model.i:
                     if key == i:
                         pisos_maximo = value
                         tiempo_asc = 0
-                        #Está en hoi,jj,iikira pico
+                        #Está en hora pico
                         if hora in Model.horas:
-                            
                             #Como está en hora pico, el ascensor se demora más
                             #10 segundos por piso, hacer dos recorridos completos pasando por cada piso
                             tiempo_asc = 20 * pisos_maximo
@@ -80,13 +87,16 @@ for i in Model.i:
                             tiempo_asc = pisos_desplazados * 5
 
                 #No toma el ascensor, toma las escaleras, entonces se demora 7 segundos en subir cada piso
-                tiempo_esc = pisos_desplazados*7
+                tiempo_esc = pisos_desplazados*6
                 t[(i,j)] = min(tiempo_asc,tiempo_esc)
+                
 
-                #if tiempo_asc<tiempo_esc:
-                    #print("Escogío el ascensor")
-                #else:
-                    #print("Escogío las escaleras")
+                if tiempo_asc<tiempo_esc:
+                    forma[i,j] = "a esta hora es más  rápido si usas el ascensor",(i,j)  
+
+                else:
+                    forma[i,j]  = "a esta hora es más rápido si usas las escaleras",(i,j)
+  
 
 # Equations
 Model.obj = Objective(expr=sum((t[i,j])*Model.si_no[i,j] for i in Model.i for j in Model.j),sense=minimize)
@@ -127,7 +137,23 @@ Model.noRepLink = Constraint(Model.i,Model.j,rule=noRepLink)
 # Solve
 SolverFactory('glpk').solve(Model)
 Model.si_no.display()
-for key, value in {k:v for k,v in Model.si_no.items() if v() == 1}.items():
-    print(key, value())
+#for key, value in {k:v for k,v in Model.si_no.items() if v() == 1}.items():
+ #   print(key, value())
 #print(D)
 # Print the results
+
+print("\n" + "*****************************************************************************************************************"+"\n")
+print("El camino que deberías tomar para llegar del edificio " + str(origen[:-1]) + " en el piso " + origen[lenIni-1] + " al edificio " + str(destino[:-1]) + " en el piso " + destino[lendest-1] + " es: ")
+for i in Model.i:
+    for j in Model.j:
+        if Model.si_no[i, j].value == 1: 
+            if i[:-1] == j[:-1] and i!=j :
+                mensaje, (initi, fini) = forma[i,j]
+                print(f"{initi} -> {fini}, {mensaje}")
+            else:
+                print(i, '->', j)
+
+        
+
+
+#print(forma)
