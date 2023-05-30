@@ -1,92 +1,58 @@
-function [sp, spcost, P] = dijkstra_v2(t, origen, destino)
-% This is an implementation of the dijkstra's algorithm, which finds the 
-% minimal cost path between two nodes. It's supoussed to solve the problem on 
-% possitive weighted instances.
-
-% the inputs of the algorithm are:
-%farthestNode: the farthest node to reach for each node after performing
-% the routing;
-% n: the number of nodes in the network;
-% s: source node index;
-% destino: destination node index;
-
-%For information about this algorithm visit:
-%http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
-
-%This implementatios is inspired by the Xiaodong Wang's implememtation of
-%the dijkstra's algorithm, available at
-%http://www.mathworks.com/matlabcentral/fileexchange
-%file ID 5550
-
-%Author: Jorge Ignacio Barrera Alviar. April/2007
-nodos = {'SD1', 'ML2', 'W1', 'AU1', 'ML5', 'W5', 'W4', 'W6', 'V1', 'V2', 'S2', 'S1', 'R1', 'TX1', 'TX3', 'TX5', 'R2', 'S12', 'Q1', 'Q3', 'O3', 'LL0', 'RGD0', 'RGD1', 'B1', 'LL3', 'C1', 'B3', 'B4', 'O1', 'C2', 'G3', 'G1'};
+function [sp, spcost] = dijkstra_v2(t, origen, destino)
+    % Obtener el número de nodos
+    num_nodos = size(t, 1);
+    nodos = {'SD1', 'ML2', 'W1', 'AU1', 'ML5', 'W5', 'W4', 'W6', 'V1', 'V2', 'S2', 'S1', 'R1', 'TX1', 'TX3', 'TX5', 'R2', 'S12', 'Q1', 'Q3', 'O3', 'LL0', 'RGD0', 'RGD1', 'B1', 'LL3', 'C1', 'B3', 'B4', 'O1', 'C2', 'G3', 'G1'};
 
 
-n=size(t,1);
-S(1:n) = 0;     %s, vector, set of visited vectors
-dist(1:n) = Inf;   % it stores the shortest distance between the source node and any other node;
-prev(1:n) = n+1;    % Previous node, informs about the best previous node known to reach each  network node 
+    % Inicializar distancias y visitados
+    distancias = Inf(1, num_nodos);
+    visitados = false(1, num_nodos);
 
-dist(origen) = 0;
+    % El nodo de origen tiene distancia cero
+    distancias(strcmp(origen, nodos)) = 0;
 
-P=1;
-flag1=1;
-while flag1==1
-    while sum(S)~=n
-        candidate=[];
-        for i=1:n
-            if S(i)==0
-                candidate=[candidate dist(i)];
-            else
-                candidate=[candidate Inf];
-            end
-        end
-        
-        %ger: detectar que no hay path
-        contInf=0;
-        for i=1:length(candidate)
-            if candidate(i)==Inf
-                contInf=contInf+1;
-            end
-        end
-        contInf
-        length(t)
-        if contInf == length(t) && S(find(strcmp(destino, nodos))) == 0
-            P = 0;
+    % Bucle principal
+    for i = 1:num_nodos
+        % Encontrar el nodo no visitado con la distancia mínima actual
+        nodo_actual = obtener_nodo_minimo(distancias, visitados);
+        visitados(nodo_actual) = true;
+
+        % Si se ha alcanzado el destino, terminar
+        if strcmp(nodos{nodo_actual}, destino)
             break;
         end
-        if contInf == length(t) && S(find(strcmp(destino, nodos))) == 1             
-            P = 1;
-            break;
-        end
-        
-        
-        [u_index u]=min(candidate);
-        S(u)=1;
-        for i=1:n
-            if(dist(u)+t(u,i))<dist(i)
-                dist(i)=dist(u)+t(u,i);
-                prev(i)=u;
+
+        % Actualizar las distancias de los nodos vecinos no visitados
+        for j = 1:num_nodos
+            if ~visitados(j) && t(nodo_actual, j) < Inf
+                nueva_distancia = distancias(nodo_actual) + t(nodo_actual, j);
+                if nueva_distancia < distancias(j)
+                    distancias(j) = nueva_distancia;
+                end
             end
         end
     end
-    
-    if P==0
-        sp=0;
-        spcost=0;
-        break;
-    end
-    
-    
-    sp = [destino];
-    
-    while sp(1) ~= s
-        if prev(sp(1))<=n
-            sp=[prev(sp(1)) sp];
-        else
-            error;
+
+    % Construir el camino más corto y su costo
+    if isinf(distancias(strcmp(destino, nodos)))
+        sp = [];
+        spcost = Inf;
+    else
+        nodo_actual = strcmp(destino, nodos);
+        sp = destino;
+        spcost = distancias(nodo_actual);
+        while ~strcmp(origen, nodos{nodo_actual})
+            vecinos = find(t(:, nodo_actual) < Inf);
+            [~, nodo_anterior] = min(distancias(vecinos));
+            nodo_actual = vecinos(nodo_anterior);
+            sp = [nodos{nodo_actual} sp];
         end
-    end;
-    spcost = dist(destino);
-    flag1=0;
+    end
+end
+
+function nodo_minimo = obtener_nodo_minimo(distancias, visitados)
+    % Obtener el nodo no visitado con la distancia mínima actual
+    distancias_temp = distancias;
+    distancias_temp(visitados) = Inf;
+    [~, nodo_minimo] = min(distancias_temp);
 end
