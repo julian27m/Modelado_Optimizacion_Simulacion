@@ -26,7 +26,8 @@ resistencia
 voltajeMenor
 voltajeMayor;
 
-***Encontrar los valores de las resistencias que minimicen la potencia disipada***
+***Minimizar la potencia total disipada***
+***Encontrar los valores de las resistencias que minimicen***
 objectiveFunction                           .. z =e= sum(i,(g(i)*g(i)*R));
 resistencia                                 .. R =e= sum(i,g(i)/v);
 voltajeMenor                                .. v =l= 10;
@@ -36,6 +37,6 @@ voltajeMayor                                .. v =g= 2;
 
 Model Ejercicio1 /all/;
 option mip=CPLEX;
-Solve Ejercicio1 using mip minimizing z;
+Solve Ejercicio1 using mip maximizing z;
 
 Display z.l;
