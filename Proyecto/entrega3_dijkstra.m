@@ -1,4 +1,4 @@
-function [sp, spcost] = entrega3_dijkstra(t, origen, destino)
+function [sp, spcost] = dijkstra_v2(t, origen, destino)
     
     % Implementación del algoritmo de Dijkstra para encontrar el camino más
     % corto entre dos nodos de la Universidad de los Andes.
@@ -36,7 +36,7 @@ function [sp, spcost] = entrega3_dijkstra(t, origen, destino)
                 end
             end
             
-            [u_index, u] = min(candidatos);
+            [~,u] = min(candidatos);
             S(u) = 1;
             
             for i = 1:num_nodos
@@ -54,11 +54,16 @@ function [sp, spcost] = entrega3_dijkstra(t, origen, destino)
             nodo_actual = strcmp(destino, nodos);
             sp = destino;
             spcost = distancias(nodo_actual);
+            % Imprimir la distancia entre cada nodo seleccionado
+            fprintf('Tiempo entre nodos:\n');
             while ~strcmp(origen, nodos{nodo_actual})
                 vecinos = find(t(:, nodo_actual) < Inf);
                 [~, nodo_anterior] = min(distancias(vecinos));
+                distancia_nodo = t(nodo_actual, vecinos(nodo_anterior));
+                fprintf('%s - %s: %.2f\n', nodos{nodo_actual}, nodos{vecinos(nodo_anterior)}, distancia_nodo);
                 nodo_actual = vecinos(nodo_anterior);
-                sp = [nodos{nodo_actual} sp];
+                sp = [nodos{nodo_actual} '  ' sp];
+
             end
             P = 1;
         end
