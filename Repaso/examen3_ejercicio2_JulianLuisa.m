@@ -1,20 +1,25 @@
 clc, clear all, close all
 
-%Inicializacion de parámetros y variables
-NMAX=100;
-Na=0; %número de llamadas
-Nb=0; %número de llamadas aceptadas
-Nc=0; %número de llamadas finalizadas
-N_llamDen=0; %número de llamdas denegadas
-Free=1; %el primer telefono del callcenter está disponible para atender llamadas.
-Free2=1; %el segundo telefono del callcenter está disponible para atender llamadas.
-n = 3; %el numero de telefonos disponibles en el callcenter
+% Parcial 3 - Ejercicio 2
+% Julian y Luisa
+% 5 es el numero mÃ­nimo de telefonos con los que se obtiene un porcentaje
+% del 100% de aceptacion de llamadas
 
-%inicialización del tiempo.
+%Inicializacion de parÃ¡metros y variables
+NMAX=100;
+Na=0; %nÃºmero de llamadas
+Nb=0; %nÃºmero de llamadas aceptadas
+Nc=0; %nÃºmero de llamadas finalizadas
+N_llamDen=0; %nÃºmero de llamdas denegadas
+n = 5; %el numero de telefonos disponibles en el callcenter
+
+
+
+%inicializaciÃ³n del tiempo.
 t=0;
 
-%vectores para mostrar grafica al final de la simulación
-vec_t=[]; %almacena el valor del tiempo en cada iteración
+%vectores para mostrar grafica al final de la simulaciÃ³n
+vec_t=[]; %almacena el valor del tiempo en cada iteraciÃ³n
 vec_porcLlamAcep=[]; %almacena el porcentaje de llamadas aceptadas a medida que avanza el tiempo
 
 %Programacion del evento inicial
@@ -28,13 +33,13 @@ evtQueue=evt;
 l = 0;
 dict_Free = struct();
 
-while l<=n
+while l<n
     clave = sprintf('free%d', l);
     dict_Free.(clave) = 1;
     l = l + 1;
 end 
-
-
+dict_Free
+llaves = fieldnames(dict_Free); 
 %Desarrollo de la simulacion
 while length(evtQueue)>0
     evtAct=evtQueue(1);
@@ -61,46 +66,35 @@ while length(evtQueue)>0
 
     if evtAct.type=='B'
         %Modificacion de variables
-        if Free==1 
-            Free=0;
-
-            Nb=Nb+1;
-
-            newEvt.t=t+unidrnd(20);
-            newEvt.type='C';
-            evtQueue=[evtQueue newEvt];
-            %fprintf('Llamada aceptada. \n');
-
         
-        %fprintf('Ocurre evento B: Atención de la llamada en el primer telefono\n');
-
-        elseif Free2==1
-            Free2=0;
-
-            Nb=Nb+1;
-
-            newEvt.t=t+unidrnd(20);
-            newEvt.type='C';
-            evtQueue=[evtQueue newEvt];
-            fprintf('Llamada aceptada. \n');
-
+        for i = 1:numel(llaves)
+            llave = llaves{i}; % Obtener la clave actual
+            valor = dict_Free.(llave); % Obtener el valor correspondiente a la clave
+            %fprintf('Clave: %s, Valor: %d\n', clave, valor); % Mostrar la clave y el valor
+            llave, valor
+            if valor==1
+                dict_Free.(llave) = 0;
+                Nb=Nb+1;
+                newEvt.t=t+unidrnd(20);
+                newEvt.type='C';
+                evtQueue=[evtQueue newEvt];
+                break
+            end
         end
-        %fprintf('Ocurre evento B: Atención de la llamada en el segundo telefono \n');
-
+        
     end
 
     if evtAct.type=='C'
-        if Free == 0
-            %Modificacion de variables
-            Nc=Nc+1;
-            Free=1;
-            %fprintf('Ocurre evento B: Finalización de la llamada en el primer telefono\n');
-        
-        elseif Free2 == 0
-            %Modificacion de variables
-            Nc=Nc+1;
-            Free2=1;
-            %fprintf('Ocurre evento B: Finalización de la llamada en el segundo telefono\n');
+        for j = 1:numel(llaves)
+            llave = llaves{j}; % Obtener la clave actual
+            valor = dict_Free.(llave); % Obtener el valor correspondiente a la clave
+            %fprintf('Clave: %s, Valor: %d\n', clave, valor); % Mostrar la clave y el valor
+            
+            if valor ==0
+                Nc=Nc+1;
+                dict_Free.(llave) = 1;
+                break
+            end
         end
     end
 
@@ -135,9 +129,9 @@ end
 
 figure
 plot(vec_t,vec_porcLlamAcep, '-o')
-title('Desempeño del Callcenter');
+title('DesempeÃ±o del Callcenter');
 xlabel('Tiempo [min]');
-ylabel('% de aceptación de llamadas');
+ylabel('% de aceptaciÃ³n de llamadas');
 ylim([0 110])
 
 
