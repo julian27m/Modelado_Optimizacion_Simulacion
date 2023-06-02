@@ -80,92 +80,49 @@ while length(evtQueue)>0
         %Origen y Destino
         s = 9;
         d = 17;
-        i = 1;
-        j = 1;
-        array=[];
-        color = 1;
+        %i = 1;
+        %j = 1;
+        evaluados = [s];
 
-        while i<length(matrLinks)
-            menor = 9999;
-            if i == s
-                l = 0;
-                plot(nodesCoordinates(i,1), nodesCoordinates(i,2), 'o', 'LineWidth',1,'MarkerEdgeColor','1,0,0', 'MarkerFaceColor','1,0,0', 'MarkerSize',7); %colorea puntos
-                while j<length(matrLinks)
-                    
-                    if matrLinks(i,j) ~= inf
-                        t = matrLinks(i,j)*3.333;
-                            %if t<menor
-                             %   menor = t;
-                             %   l = j; %Menor vecino
-                            %end  
-                            
-                        plot(nodesCoordinates(j,1), nodesCoordinates(j,2), 'o', 'LineWidth',1,'MarkerEdgeColor','0,0,1', 'MarkerFaceColor','0,0,1', 'MarkerSize',7); %colorea puntos
-                        if color == 1
-                           plot(nodesCoordinates(j,1), nodesCoordinates(j,2), 'o', 'LineWidth',1,'MarkerEdgeColor','1,0,0', 'MarkerFaceColor','1,0,0', 'MarkerSize',7); %colorea puntos
-                           color = 0;
-                        end
-                        array=[array,j];
-                        matrLinks(i,j) = inf;
-                        matrLinks(j,i)= inf;
-                        newEvt.type='A';
-                        evtQueue=[evtQueue newEvt];
-                    end
-                    j = j + 1;
-                end 
-                %plot(nodesCoordinates(l,1), nodesCoordinates(l,2), 'o', 'LineWidth',1,'MarkerEdgeColor','1,0,0', 'MarkerFaceColor','1,0,0', 'MarkerSize',7); %colorea puntos            
+
+        k = 1
+        while k<length(evaluados)+1 && k<30
+            if evaluados(k) == s
+                plot(nodesCoordinates(s,1), nodesCoordinates(s,2), 'o', 'LineWidth',1,'MarkerEdgeColor','1,0,0', 'MarkerFaceColor','1,0,0', 'MarkerSize',7); %colorea puntos
             end
-            i = i + 1;
-        end    
-        array
-        
-        i = 1;
-        %for i=1:length(array)+1
-        elegidos = [];
-        while i<=length(array)
-            
-            menor = 9999;
-            elemento= array(i);
-            elemento;
-            color2 = 1;
-             l = 0;
-             
-                for j=1:length(matrLinks)
+            %color = 1;
+            for i=1:length(matrLinks)
+                if evaluados(k) == i
                     
-                    if matrLinks(elemento,j) ~= inf && ~ismember(j, array)
-                        
-                        t = matrLinks(elemento,j)*3.333;
+                    for j=1:length(matrLinks)
+                        if matrLinks(i,j) ~= inf
+                            if ~ismember(j, evaluados)
+                                t = matrLinks(i,j)*3.333;
+                                plot(nodesCoordinates(j,1), nodesCoordinates(j,2), 'o', 'LineWidth',1,'MarkerEdgeColor','0,0,1', 'MarkerFaceColor','0,0,1', 'MarkerSize',7); %colorea puntos
+                                k;
+                                evaluados = [evaluados,j];
+                                
+                                newEvt.type='A';
+                                evtQueue=[evtQueue newEvt];
+                                    
+                            end
                             
-                        plot(nodesCoordinates(j,1), nodesCoordinates(j,2), 'o', 'LineWidth',1,'MarkerEdgeColor','0,0,1', 'MarkerFaceColor','0,0,1', 'MarkerSize',7); %colorea puntos
-                        
-                        if ~ismember(j, elegidos) or ~ismember(elemento, elegidos)
-                           j
-                           elemento
-                           plot(nodesCoordinates(j,1), nodesCoordinates(j,2), 'o', 'LineWidth',1,'MarkerEdgeColor','1,0,0', 'MarkerFaceColor','1,0,0', 'MarkerSize',7); %colorea puntos
-                           elegidos=[elegidos,j]
-                           elegidos=[elegidos,elemento]
-                           
-                           
                         end
                         
-                        matrLinks(elemento,j) = inf;
-                        matrLinks(j,elemento)= inf;
-                        
-                        array=[array,j];
-                   
                     end
-                        
-
-                end
-                
-                array;
-                %fprintf('Luisa');
-                
-                
-           i = i+1;     
-        end
+                    i;
+                    k;
+                    evaluados
+                    l = length(evaluados)
+                    plot(nodesCoordinates(evaluados(l),1), nodesCoordinates(evaluados(l),2), 'o', 'LineWidth',1,'MarkerEdgeColor','1,0,0', 'MarkerFaceColor','1,0,0', 'MarkerSize',7); %colorea puntos
+                                
+                end    
+            end
+            k = k+1;
+        end    
         
-                
-    end
+
+    end   
     
     
      
